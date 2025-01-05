@@ -71,9 +71,13 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
           <Separator className="my-6" />
           <div className="grid gap-4">
             <h3 className="text-xl font-bold">Tags</h3>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               {post.tags.map((tag) => (
-                <Badge key={tag} variant={'secondary'} className="select-none cursor-pointer">
+                <Badge 
+                  key={tag} 
+                  variant={'secondary'} 
+                  className="select-none cursor-pointer"
+                >
                   {tag}
                 </Badge>
               ))}
