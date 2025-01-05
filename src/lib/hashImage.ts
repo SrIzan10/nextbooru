@@ -1,5 +1,4 @@
 import sharp from 'sharp';
-import crypto from 'crypto';
 
 export default async function hashImage(imageBuffer: Buffer) {
   try {

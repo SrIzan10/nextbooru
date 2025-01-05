@@ -17,6 +17,7 @@ model User {
   id              String    @id @default(cuid())
   username        String    @unique
   hashed_password String
+  likedPosts      String[]
   sessions        Session[]
   posts           Post[]
 }

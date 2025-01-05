@@ -1,12 +1,15 @@
+import LikePost from '@/components/app/LikePost/LikePost';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { validateRequest } from '@/lib/auth';
 import prisma from '@/lib/db';
-import { Heart, Download, Flag, MessageSquare, Link, User, Calendar } from 'lucide-react';
+import { Download, Flag, MessageSquare, User, Calendar } from 'lucide-react';
 import Image from 'next/image';
 
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
+  const { user } = await validateRequest();
   const { id } = await params;
   const post = await prisma.post.findUnique({ where: { id }, include: { author: true } });
   if (!post) {
@@ -31,9 +34,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
               </div>
               <div className="p-4 flex justify-between items-center">
                 <div className="flex space-x-2">
-                  <Button variant="outline" size="icon">
-                    <Heart className="h-4 w-4" />
-                  </Button>
+                  <LikePost id={id} liked={user?.likedPosts!.includes(id)!} />
                   <a href={post.imageUrl} download>
                     <Button variant="outline" size="icon">
                       <Download className="h-4 w-4" />
