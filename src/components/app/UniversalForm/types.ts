@@ -6,6 +6,8 @@ export type FormFieldConfig = {
   name: string;
   label: string;
   type?: HTMLInputTypeAttribute;
+  customComponent?: React.ReactNode;
+  hiddenShowLabel?: boolean;
   placeholder?: string;
   description?: string;
   value?: string;
@@ -17,7 +19,7 @@ export type UniversalFormProps<T extends z.ZodType> = {
   fields: FormFieldConfig[];
   schemaName: (typeof schemaDb)[number]['name'];
   action: (prev: any, formData: FormData) => void;
-  onActionComplete?: (result: unknown) => void;
+  onActionComplete?: (result: any) => void;
   defaultValues?: Partial<z.infer<T>>;
   submitText?: string;
   submitClassname?: string;

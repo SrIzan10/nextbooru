@@ -1,6 +1,6 @@
 'use client';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Path, PathValue, useForm } from 'react-hook-form';
+import { Path, useForm } from 'react-hook-form';
 import {
   Form,
   FormControl,
@@ -19,11 +19,12 @@ import React from 'react';
 import { toast } from 'sonner';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
-import { accountSchema } from '@/lib/form/zod';
+import { accountSchema, uploadSchema } from '@/lib/form/zod';
 
 export const schemaDb = [
   { name: 'login', zod: accountSchema },
   { name: 'register', zod: accountSchema },
+  { name: 'upload', zod: uploadSchema },
 ] as const;
 
 export function UniversalForm<T extends z.ZodType>({
@@ -78,23 +79,28 @@ export function UniversalForm<T extends z.ZodType>({
             name={field.name as Path<z.infer<T>>}
             render={({ field: formField }) => (
               <FormItem>
-                {field.type !== 'hidden' && <FormLabel>{field.label}</FormLabel>}
+                {field.type !== 'hidden' && !field.hiddenShowLabel && (
+                  <FormLabel>{field.label}</FormLabel>
+                )}
                 <FormControl>
-                  {field.textArea ? (
-                    <Textarea
-                      placeholder={field.placeholder}
-                      {...formField}
-                      value={formField.value ?? ''}
-                      rows={field.textAreaRows ?? 5}
-                    />
-                  ) : (
-                    <Input
-                      type={field.type || 'text'}
-                      placeholder={field.placeholder}
-                      {...formField}
-                      value={formField.value ?? ''}
-                    />
-                  )}
+                  <div>
+                    {field.textArea ? (
+                      <Textarea
+                        placeholder={field.placeholder}
+                        {...formField}
+                        value={formField.value ?? ''}
+                        rows={field.textAreaRows ?? 5}
+                      />
+                    ) : (
+                      <Input
+                        type={field.type || 'text'}
+                        placeholder={field.placeholder}
+                        {...formField}
+                        value={formField.value ?? ''}
+                      />
+                    )}
+                    {field.customComponent && field.customComponent}
+                  </div>
                 </FormControl>
                 {field.description && <FormDescription>{field.description}</FormDescription>}
                 <FormMessage />
@@ -102,7 +108,7 @@ export function UniversalForm<T extends z.ZodType>({
             )}
           />
         ))}
-        <div className={cn("flex gap-2 py-2", submitButtonDivClassname)}>
+        <div className={cn('flex gap-2 py-2', submitButtonDivClassname)}>
           {otherSubmitButton}
           <SubmitButton buttonText={submitText} className={submitClassname} />
         </div>
