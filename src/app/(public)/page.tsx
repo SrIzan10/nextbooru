@@ -3,7 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 export default async function Home() {
-  const posts = await prisma.post.findMany({ take: 30 });
+  const posts = await prisma.post.findMany({ take: 30, orderBy: { createdAt: 'desc' } });
   return (
     <div className="text-center pt-2">
       <h1>This is nextbooru</h1>

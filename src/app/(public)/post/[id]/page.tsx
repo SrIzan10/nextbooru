@@ -83,7 +83,13 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
               ))}
             </div>
           </div>
-          {/* related images missing */}
+          <Separator className="my-6" />
+          <div className="grid gap-4">
+            <h3 className="text-xl font-bold">Related images</h3>
+            <div className="flex flex-wrap gap-2">
+              {/* related images missing */}
+            </div>
+          </div>
         </div>
       </div>
     </div>

@@ -9,6 +9,7 @@ export async function register() {
     const fs = await import('fs/promises');
     const { default: hashImage } = await import('@/lib/hashImage');
     const { glob } = await import('glob');
+    const minio = (await import('@/lib/services/minio')).default;
 
     const job = async () => {
       console.log('Deleting prior safebooru posts and accounts...');
@@ -16,14 +17,20 @@ export async function register() {
         where: { author: { username: { startsWith: 'safebooru-' } } },
       });
       await prisma.user.deleteMany({ where: { username: { startsWith: 'safebooru-' } } });
-      const files = await glob('public/uploads/safebooru-*.jpg');
-      await Promise.all(files.map((file) => fs.rm(file, { force: true })));
+
+      const minioIsSSL = process.env.MINIO_USE_SSL === 'true';
+      const objectStream = minio.listObjects(process.env.MINIO_BUCKET!, 'safebooru-');
+      const objectList = [];
+      for await (const obj of objectStream) {
+        objectList.push(obj.name);
+      }
+      await minio.removeObjects(process.env.MINIO_BUCKET!, objectList);
 
       console.log('Pulling safebooru images...');
       console.log('Fetching...');
       const res = await fetch(
         'https://safebooru.org/index.php?page=dapi&s=post&q=index&json=1&limit=30',
-        { headers: { 'User-Agent': 'nextbooru' } }
+        { headers: { 'User-Agent': 'mepicanloshuevos' } }
       );
       const posts = await res.json();
 
@@ -40,8 +47,15 @@ export async function register() {
       console.log('Downloading all images...');
       for (const post of posts) {
         const imageUrl = await fetch(post.file_url).then((res) => res.arrayBuffer());
-        const savedFilename = `public/uploads/safebooru-${genId}-${post.id}.jpg`;
-        await fs.writeFile(savedFilename, new Uint8Array(imageUrl));
+        const savedFilename = `http${minioIsSSL ? 's' : ''}://${process.env.MINIO_ENDPOINT}/${
+          process.env.MINIO_BUCKET
+        }/safebooru-${genId}-${post.id}.jpg`;
+        //await fs.writeFile(savedFilename, new Uint8Array(imageUrl));
+        await minio.putObject(
+          process.env.MINIO_BUCKET!,
+          `safebooru-${genId}-${post.id}.jpg`,
+          Buffer.from(imageUrl)
+        );
         const previewHash = await hashImage(Buffer.from(imageUrl));
         await prisma.post.create({
           data: {

@@ -1,11 +1,11 @@
 'use server';
 
-import { writeFile } from 'fs/promises';
 import zodVerify from '../zodVerify';
 import { uploadSchema } from './zod';
 import prisma from '../db';
 import { validateRequest } from '../auth';
 import hashImage from '../hashImage';
+import minio from '../services/minio';
 
 export async function create(prev: any, formData: FormData) {
   const { user } = await validateRequest();
@@ -21,12 +21,12 @@ export async function create(prev: any, formData: FormData) {
 
   const arrayBuffer = await file.arrayBuffer();
   const buffer = Buffer.from(arrayBuffer);
-  const uint = new Uint8Array(arrayBuffer);
   const filename = `${Date.now()}-${file.name.replaceAll(' ', '_')}`;
-  await writeFile(`./public/uploads/${filename}`, uint).catch((e) => {
-    console.log(e);
-    return { success: false, message: 'writing file' };
-  });
+  await minio.putObject(process.env.MINIO_BUCKET!, filename, buffer);
+  const minioIsSSL = process.env.MINIO_USE_SSL === 'true';
+  const savedUrl = `http${minioIsSSL ? 's' : ''}://${process.env.MINIO_ENDPOINT}/${
+    process.env.MINIO_BUCKET
+  }/${filename}`;
 
   const imagePreviewHash = await hashImage(buffer);
 
@@ -34,14 +34,14 @@ export async function create(prev: any, formData: FormData) {
     data: {
       caption: zod.data.caption,
       tags: zod.data.tags.split(',').map((tag: string) => tag.trim()),
-      imageUrl: `/uploads/${filename}`,
+      imageUrl: savedUrl,
       previewHash: imagePreviewHash,
       author: {
         connect: {
-          id: user.id
-        }
-      }
+          id: user.id,
+        },
+      },
     },
   });
-  return {  success: true, id: dbCreate.id };
+  return { success: true, id: dbCreate.id };
 }
