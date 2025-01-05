@@ -29,11 +29,12 @@ model Session {
 }
 
 model Post {
-  id        String   @id @default(cuid())
-  imageUrl  String
-  caption   String
-  createdAt DateTime @default(now())
-  tags      String[]
-  authorId  String
-  author    User     @relation(references: [id], fields: [authorId], onDelete: Cascade)
+  id          String   @id @default(cuid())
+  imageUrl    String
+  caption     String
+  createdAt   DateTime @default(now())
+  tags        String[]
+  authorId    String
+  author      User     @relation(references: [id], fields: [authorId], onDelete: Cascade)
+  previewHash String
 }

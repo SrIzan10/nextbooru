@@ -16,7 +16,7 @@ export const uploadSchema = z.object({
   file: z
     .any()
     .refine((file: File) => file?.name !== '', 'No file name found.')
-    .refine((file) => file.size < 5000000, 'Max size is 5MB.'),
+    .refine((file) => file.size < 20000000, 'Max size is 20MB.'),
   caption: z.string().min(1),
   tags: z.string().min(1),
 });

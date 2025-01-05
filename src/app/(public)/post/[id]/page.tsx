@@ -10,7 +10,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
   const { id } = await params;
   const post = await prisma.post.findUnique({ where: { id }, include: { author: true } });
   if (!post) {
-    return <div>Post not found</div>;
+    return <h1>Post not found</h1>;
   }
 
   return (
@@ -23,9 +23,10 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
                 <Image
                   src={post.imageUrl}
                   alt="Post image"
-                  layout="fill"
-                  objectFit="contain"
-                  className="rounded-t-lg"
+                  fill
+                  className="rounded-t-lg object-contain"
+                  blurDataURL={`data:image/jpeg;base64,${post.previewHash}`}
+                  placeholder="blur"
                 />
               </div>
               <div className="p-4 flex justify-between items-center">
@@ -61,7 +62,12 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
             <Calendar className="h-6 w-6" />
             <span>Uploaded on: {post.createdAt.toLocaleString()}</span>
           </div>
-          <Separator className='my-6' />
+          <Separator className="my-6" />
+          <div className="grid gap-4">
+            <h3 className="text-xl font-bold">Description</h3>
+            <p>{post.caption}</p>
+          </div>
+          <Separator className="my-6" />
           <div className="grid gap-4">
             <h3 className="text-xl font-bold">Tags</h3>
             <div className="flex gap-2">
