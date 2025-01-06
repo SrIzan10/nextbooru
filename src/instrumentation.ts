@@ -28,7 +28,7 @@ export async function register() {
       console.log('Pulling safebooru images...');
       console.log('Fetching...');
       const res = await fetch(
-        'https://safebooru.org/index.php?page=dapi&s=post&q=index&json=1&limit=30',
+        'https://safebooru.org/index.php?page=dapi&s=post&q=index&json=1&limit=40',
         { headers: { 'User-Agent': 'nextbooru' } }
       );
       const posts = await res.json();
