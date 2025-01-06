@@ -1,4 +1,5 @@
 import LikePost from '@/components/app/LikePost/LikePost';
+import RelatedImages, { RelatedImagesSkeleton } from '@/components/app/RelatedImages/RelatedImages';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -7,6 +8,7 @@ import { validateRequest } from '@/lib/auth';
 import prisma from '@/lib/db';
 import { Download, Flag, MessageSquare, User, Calendar } from 'lucide-react';
 import Image from 'next/image';
+import { Suspense } from 'react';
 
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
   const { user } = await validateRequest();
@@ -85,10 +87,9 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
           </div>
           <Separator className="my-6" />
           <div className="grid gap-4">
-            <h3 className="text-xl font-bold">Related images</h3>
-            <div className="flex flex-wrap gap-2">
-              {/* related images missing */}
-            </div>
+            <Suspense fallback={<RelatedImagesSkeleton />}>
+              <RelatedImages id={id} />
+            </Suspense>
           </div>
         </div>
       </div>

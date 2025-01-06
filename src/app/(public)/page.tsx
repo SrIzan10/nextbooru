@@ -31,7 +31,7 @@ export default async function Home() {
             />
             <Link
               href={`/post/${post.id}`}
-              className="absolute inset-0 z-10 hover:bg-black/5"
+              className="absolute inset-0 z-10 hover:bg-muted-foreground/5"
               aria-label="View post details"
             />
           </div>

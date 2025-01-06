@@ -8,7 +8,6 @@ export async function register() {
     const { generateId } = await import('lucia');
     const fs = await import('fs/promises');
     const { default: hashImage } = await import('@/lib/hashImage');
-    const { glob } = await import('glob');
     const minio = (await import('@/lib/services/minio')).default;
 
     const job = async () => {
@@ -30,7 +29,7 @@ export async function register() {
       console.log('Fetching...');
       const res = await fetch(
         'https://safebooru.org/index.php?page=dapi&s=post&q=index&json=1&limit=30',
-        { headers: { 'User-Agent': 'mepicanloshuevos' } }
+        { headers: { 'User-Agent': 'nextbooru' } }
       );
       const posts = await res.json();
 
@@ -63,7 +62,7 @@ export async function register() {
             previewHash,
             authorId: account.id,
             tags: post.tags.split(' '),
-            caption: post.source,
+            caption: post.source || '',
           },
         });
         console.log(`Downloaded id ${post.id}`);
@@ -72,6 +71,6 @@ export async function register() {
 
     await job();
 
-    new CronJob('0 */2 * * *', async () => await job(), null, true);
+    //  new CronJob('0 */2 * * *', async () => await job(), null, true);
   }
 }
