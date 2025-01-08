@@ -25,6 +25,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.0",
     "cron": "^3.3.2",
+    "ioredis": "^5.4.2",
     "lucia": "^3.1.1",
     "lucide-react": "^0.368.0",
     "minio": "^8.0.3",
@@ -37,6 +38,7 @@
     "sonner": "^1.4.41",
     "tailwind-merge": "^2.2.2",
     "tailwindcss-animate": "^1.0.7",
+    "unstorage": "^1.14.4",
     "zod": "^3.24.1"
   },
   "devDependencies": {

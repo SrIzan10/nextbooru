@@ -9,3 +9,13 @@ services:
       - ./psql:/var/lib/postgresql/data
     ports:
       - 5555:5432
+  dragonfly:
+    image: 'docker.dragonflydb.io/dragonflydb/dragonfly'
+    ulimits:
+      memlock: -1
+    ports:
+      - "6379:6379"
+    environment:
+      DRAGONFLY_PASSWORD: dfsjhkdswkjntelsmldbfvsgknl5t
+    volumes:
+      - ./draognfly:/data
