@@ -1,4 +1,4 @@
-import Comments from '@/components/app/Comments/Comments';
+import Comments, { CommentSkeleton } from '@/components/app/Comments/Comments';
 import LikePost from '@/components/app/LikePost/LikePost';
 import RelatedImages, { RelatedImagesSkeleton } from '@/components/app/RelatedImages/RelatedImages';
 import { Badge } from '@/components/ui/badge';
@@ -57,7 +57,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
               </div>
             </CardContent>
           </Card>
-          <Suspense fallback={<div>Loading comments...</div>}>
+          <Suspense fallback={<CommentSkeleton />}>
             <Comments id={id} />
           </Suspense>
         </div>
