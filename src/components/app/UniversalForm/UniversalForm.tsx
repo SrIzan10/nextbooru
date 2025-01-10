@@ -19,12 +19,13 @@ import React from 'react';
 import { toast } from 'sonner';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
-import { accountSchema, uploadSchema } from '@/lib/form/zod';
+import { accountSchema, commentSchema, uploadSchema } from '@/lib/form/zod';
 
 export const schemaDb = [
   { name: 'login', zod: accountSchema },
   { name: 'register', zod: accountSchema },
   { name: 'upload', zod: uploadSchema },
+  { name: 'comment', zod: commentSchema },
 ] as const;
 
 export function UniversalForm<T extends z.ZodType>({
@@ -37,10 +38,12 @@ export function UniversalForm<T extends z.ZodType>({
   submitClassname,
   otherSubmitButton,
   submitButtonDivClassname,
+  resetFormOnSubmit,
 }: UniversalFormProps<T>) {
   // @ts-ignore idk why this error is happening, first apprearing on the react 19 update.
   const [state, formAction] = useActionState<{ success: boolean; error?: string }>(action, null);
   const schema = schemaDb.find((s) => s.name === schemaName)?.zod;
+  const formRef = React.useRef<HTMLFormElement>(null);
 
   if (!schema) {
     throw new Error(`Schema "${schemaName}" not found`);
@@ -61,6 +64,12 @@ export function UniversalForm<T extends z.ZodType>({
   });
 
   React.useEffect(() => {
+    if (state?.success && resetFormOnSubmit) {
+      form.reset(initialValues as z.infer<T>);
+    }
+  }, [state, resetFormOnSubmit, form, initialValues]);
+
+  React.useEffect(() => {
     if (state && !state.success) {
       toast.error(state.error);
     }
@@ -71,7 +80,7 @@ export function UniversalForm<T extends z.ZodType>({
 
   return (
     <Form {...form}>
-      <form action={formAction} className="space-y-2">
+      <form action={formAction} className="space-y-2" ref={formRef}>
         {fields.map((field) => (
           <FormField
             key={field.name}
@@ -90,6 +99,7 @@ export function UniversalForm<T extends z.ZodType>({
                         {...formField}
                         value={formField.value ?? ''}
                         rows={field.textAreaRows ?? 5}
+                        required={field.required}
                       />
                     ) : (
                       <Input
@@ -97,6 +107,7 @@ export function UniversalForm<T extends z.ZodType>({
                         placeholder={field.placeholder}
                         {...formField}
                         value={formField.value ?? ''}
+                        required={field.required}
                       />
                     )}
                     {field.customComponent && field.customComponent}

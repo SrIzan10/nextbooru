@@ -1,3 +1,4 @@
+import Comments from '@/components/app/Comments/Comments';
 import LikePost from '@/components/app/LikePost/LikePost';
 import RelatedImages, { RelatedImagesSkeleton } from '@/components/app/RelatedImages/RelatedImages';
 import { Badge } from '@/components/ui/badge';
@@ -8,6 +9,7 @@ import { validateRequest } from '@/lib/auth';
 import prisma from '@/lib/db';
 import { Download, Flag, MessageSquare, User, Calendar } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { Suspense } from 'react';
 
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
@@ -46,14 +48,18 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
                     <Flag className="h-4 w-4" />
                   </Button>
                 </div>
-                <Button>
-                  <MessageSquare className="h-4 w-4 mr-2" />
-                  Comments
-                </Button>
+                <Link href={'#comments'}>
+                  <Button>
+                    <MessageSquare className="h-4 w-4 mr-2" />
+                    Comments
+                  </Button>
+                </Link>
               </div>
             </CardContent>
           </Card>
-          <p>comments here</p>
+          <Suspense fallback={<div>Loading comments...</div>}>
+            <Comments id={id} />
+          </Suspense>
         </div>
         <div className="flex flex-col gap-2">
           <h3 className="text-xl font-bold">Image information</h3>
@@ -75,11 +81,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
             <h3 className="text-xl font-bold">Tags</h3>
             <div className="flex flex-wrap gap-2">
               {post.tags.map((tag) => (
-                <Badge 
-                  key={tag} 
-                  variant={'secondary'} 
-                  className="select-none cursor-pointer"
-                >
+                <Badge key={tag} variant={'secondary'} className="select-none cursor-pointer">
                   {tag}
                 </Badge>
               ))}

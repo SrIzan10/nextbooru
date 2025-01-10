@@ -20,6 +20,7 @@ model User {
   likedPosts      String[]
   sessions        Session[]
   posts           Post[]
+  comments        Comment[]
 }
 
 model Session {
@@ -38,4 +39,18 @@ model Post {
   authorId    String
   author      User     @relation(references: [id], fields: [authorId], onDelete: Cascade)
   previewHash String
+
+  comments Comment[]
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  postId    String
+  authorId  String
+  content   String
+  createdAt DateTime @default(now())
+  upvotes   Int
+  votedBy   String[]
+  post      Post     @relation(references: [id], fields: [postId], onDelete: Cascade)
+  author    User     @relation(references: [id], fields: [authorId], onDelete: Cascade)
 }

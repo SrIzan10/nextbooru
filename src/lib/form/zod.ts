@@ -20,3 +20,8 @@ export const uploadSchema = z.object({
   caption: z.string().min(1),
   tags: z.string().min(1),
 });
+
+export const commentSchema = z.object({
+  postId: z.string().min(1),
+  content: z.string().min(1),
+});

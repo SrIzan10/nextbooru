@@ -83,6 +83,7 @@ export async function register() {
         }
       }
 
+      await ephemeralStorage.clear('tag')
       for (const [tag, count] of Object.entries(occurrences)) {
         await ephemeralStorage.set(`tag:${tag}`, count);
       }

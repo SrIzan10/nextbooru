@@ -1,11 +1,12 @@
 'use server';
 
 import zodVerify from '../zodVerify';
-import { uploadSchema } from './zod';
+import { commentSchema, uploadSchema } from './zod';
 import prisma from '../db';
 import { validateRequest } from '../auth';
 import hashImage from '../hashImage';
 import minio from '../services/minio';
+import { revalidatePath } from 'next/cache';
 
 export async function create(prev: any, formData: FormData) {
   const { user } = await validateRequest();
@@ -44,4 +45,65 @@ export async function create(prev: any, formData: FormData) {
     },
   });
   return { success: true, id: dbCreate.id };
+}
+
+export async function createComment(prev: any, formData: FormData) {
+  const { user } = await validateRequest();
+  if (!user) {
+    return { success: false, message: 'not logged in' };
+  }
+  const zod = await zodVerify(commentSchema, formData);
+  if (!zod.success) {
+    return zod;
+  }
+
+  await prisma.comment.create({
+    data: {
+      content: zod.data.content,
+      author: {
+        connect: {
+          id: user.id,
+        },
+      },
+      post: {
+        connect: {
+          id: zod.data.postId,
+        },
+      },
+      upvotes: 0,
+    },
+  });
+  revalidatePath(`/post/${zod.data.postId}`);
+  return { success: true };
+}
+
+export async function upvoteComment(commentId: string) {
+  const { user } = await validateRequest();
+  if (!user) {
+    return { success: false, message: 'not logged in' };
+  }
+
+  const comment = await prisma.comment.findUnique({ where: { id: commentId } });
+  if (!comment) {
+    return { success: false, message: 'comment not found' };
+  }
+
+  if (comment.votedBy.includes(user.id)) {
+    await prisma.comment.update({
+      where: { id: commentId },
+      data: {
+        upvotes: comment.upvotes - 1,
+        votedBy: { set: comment.votedBy.filter((id) => id !== user.id) },
+      },
+    });
+    revalidatePath(`/post/${comment.postId}`);
+    return { success: true, action: 'down' };
+  } else {
+    await prisma.comment.update({
+      where: { id: commentId },
+      data: { upvotes: comment.upvotes + 1, votedBy: { push: user.id } },
+    });
+    revalidatePath(`/post/${comment.postId}`);
+    return { success: true, action: 'up' };
+  }
 }
