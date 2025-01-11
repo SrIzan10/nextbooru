@@ -6,12 +6,16 @@ import { SessionProvider } from "@/lib/providers/SessionProvider";
 import { validateRequest } from "@/lib/auth";
 import { Toaster } from "@/components/ui/sonner"
 import { ThemeProvider } from "@/lib/providers/ThemeProvider";
+import localFont from 'next/font/local'
 
-const inter = Inter({ subsets: ["latin"] });
+const satoshi = localFont({
+  src: './satoshimd.otf',
+  display: 'swap',
+})
 
 export const metadata: Metadata = {
-  title: "stack",
-  description: "The tech stack for your next(.js) project.",
+  title: "nextbooru",
+  description: "A fast image sharing platform in next.js",
 };
 
 export default async function RootLayout({
@@ -22,7 +26,7 @@ export default async function RootLayout({
   const sessionData = await validateRequest()
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={satoshi.className}>
         <SessionProvider value={sessionData}>
           <ThemeProvider
             attribute="class"

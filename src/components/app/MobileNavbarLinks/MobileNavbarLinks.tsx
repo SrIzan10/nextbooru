@@ -19,7 +19,7 @@ export default function MobileNavbarLinks() {
             <Button>Menu</Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-56">
-            <DropdownMenuLabel>stack</DropdownMenuLabel>
+            <DropdownMenuLabel>nextbooru</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
                 {links.map((link) => (
