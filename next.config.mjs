@@ -12,10 +12,12 @@ const nextConfig = {
   images: {
     remotePatterns: [
       {
-        hostname: process.env.MINIO_ENDPOINT,
+        protocol: "https",
+        hostname: "**",
       },
     ],
   },
+  output: 'standalone',
 };
 
 export default nextConfig;
