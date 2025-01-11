@@ -1,26 +1,44 @@
-# modified from https://github.com/leerob/next-self-host
+# Stage 1: Building the code
+FROM node:lts-alpine AS builder
 
-FROM node:alpine AS base
-
-# Stage 1: Install dependencies
-FROM base AS deps
 WORKDIR /app
+
+# Copy package files
 COPY package.json yarn.lock ./
+
+# Install dependencies
 RUN yarn install --frozen-lockfile
 
-# Stage 2: Build the application
-FROM base AS builder
-WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
+# Copy app files
 COPY . .
-RUN yarn run build
 
-# Stage 3: Production server
-FROM base AS runner
+# Build app
+RUN yarn build
+
+# Stage 2: Production
+FROM node:lts-alpine AS runner
+
 WORKDIR /app
+
 ENV NODE_ENV=production
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
+
+# Copy necessary files
+COPY --from=builder /app/next.config.mjs ./
+COPY --from=builder /app/package.json ./
+COPY --from=builder /app/yarn.lock ./
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/prisma ./prisma
+
+# Install production dependencies only
+RUN yarn install --frozen-lockfile --production && \
+    yarn cache clean
+
+# Remove unnecessary files
+RUN rm -rf /app/.git \
+    /app/.next/cache \
+    /app/README.md
 
 EXPOSE 3000
-CMD ["node", "server.js"]
+
+CMD ["yarn", "start"]
