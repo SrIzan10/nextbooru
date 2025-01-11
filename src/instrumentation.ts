@@ -66,7 +66,7 @@ export async function register() {
         console.log(`Downloaded id ${post.id}`);
       }
     };
-    // await safebooruJob();
+    await safebooruJob();
 
     const writeTagsToEphemeral = async () => {
       // TODO: move tags to another table. this is a temporary and inefficient solution.
