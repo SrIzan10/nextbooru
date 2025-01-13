@@ -13,7 +13,7 @@
     "ui:add": "shadcn add"
   },
   "dependencies": {
-    "@hookform/resolvers": "^3.9.1",
+    "@hookform/resolvers": "^3.10.0",
     "@lucia-auth/adapter-prisma": "^4.0.1",
     "@node-rs/argon2": "^2.0.2",
     "@prisma/client": "^6.2.1",
